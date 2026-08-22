@@ -1,0 +1,49 @@
+# Loaded automatically before the user script. Extends the native App class
+# (App.background is defined in app.cpp) with helpers built on Raylib bindings.
+class App
+  def self.mouse_x
+    Raylib.GetMouseX
+  end
+
+  def self.mouse_y
+    Raylib.GetMouseY
+  end
+
+  def self.prev_mouse_x
+    mouse_x - Raylib.GetMouseDelta.x
+  end
+
+  def self.prev_mouse_y
+    mouse_y - Raylib.GetMouseDelta.y
+  end
+
+  def self.gray(value, alpha = 255)
+    Raylib::Color.new(value, value, value, alpha)
+  end
+end
+def app_setup()
+  App.background(App.gray(102))
+end
+
+def app_update(vg, t)
+  #print "Mouse: (#{App.mouse_x}, #{App.mouse_y}, #{App.prev_mouse_x}, #{App.prev_mouse_y})\n"
+  variable_ellipse(vg, App.mouse_x, App.mouse_y, App.prev_mouse_x, App.prev_mouse_y)
+end
+
+def variable_ellipse(vg, x, y, px, py)
+  speed = (x - px).abs + (y - py).abs
+  gray_value = speed.to_i
+  gray_value = 0 if gray_value < 0
+  gray_value = 255 if gray_value > 255
+
+  NanoVG.nvgBeginPath(vg)
+  NanoVG.nvgEllipse(vg, x, y, speed / 2.0, speed / 2.0)
+  NanoVG.nvgFillColor(vg, NanoVG.nvgRGBA(0, 160, 192, 255))
+  NanoVG.nvgFill(vg)
+  NanoVG.nvgStrokeColor(vg, NanoVG.nvgRGBA(255, 255, 255, 255))
+  NanoVG.nvgStrokeWidth(vg, 1.0)
+  NanoVG.nvgStroke(vg)
+end
+
+def app_cleanup()
+end
